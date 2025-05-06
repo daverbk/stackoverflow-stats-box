@@ -30,17 +30,21 @@ async function update_gist(user_data, user_ques, user_ans, user_top_tag) {
   answers = String("Answers:").padEnd(12) + user_ans.total
 
   content_table = [
-    `❤️ ${tags}❤️`,
-    `--- Stack Overflow Stats ---`,
+    `${tags}`,
     `🥇 ${gold}| ${reputation}`,
     `🥈 ${silver}| ${questions}`,
     `🥉 ${bronze}| ${answers}`,
   ].join("\n")
 
+  const gist = await octokit.request('GET /gists/{gist_id}', {
+        gist_id: GIST_ID,
+    });
+  const filename = Object.keys(gist.data.files)[0];
+  
   await octokit.request('PATCH /gists/{gist_id}', {
     gist_id: GIST_ID,
     files: {
-      'stackoverflow_state.md': {
+      [filename]: {
         content: content_table
       }
     }
